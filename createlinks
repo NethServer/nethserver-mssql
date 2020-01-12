@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (C) 2019 Nethesis S.r.l.
+# Copyright (C) 2020 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
 # 
 # This script is part of NethServer.
@@ -28,6 +28,10 @@ $event = "nethserver-mssql-update";
 
 event_actions($event, qw(
   initialize-default-databases 00
+));
+
+event_templates($event, qw(
+  /root/.ms.cnf
 ));
 
 $event = "nethserver-mssql-save";
