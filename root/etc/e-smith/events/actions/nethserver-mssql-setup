@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+EVENT=$1
+PRODUCT=$(/sbin/e-smith/config getprop mssql ProductId)
+
+perl -e "use esmith::util; 
+         use NethServer::Password; 
+         NethServer::Password::store('mssql');"
+
+PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
+
+MSSQL_SA_PASSWORD=${PASSWORD} MSSQL_PID=${PRODUCT} SQL_ENABLE_AGENT='y' /opt/mssql/bin/mssql-conf -n setup accept-eula
+echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+source ~/.bashrc
+
+/sbin/e-smith/config setprop mssql-server status enabled
+
+/opt/mssql/bin/mssql-conf set sqlagent.enabled true
