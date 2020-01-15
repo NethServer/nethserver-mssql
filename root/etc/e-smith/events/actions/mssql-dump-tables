@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
+BACKUPDIR="/var/lib/nethserver/backup/mssql"
+STATUS=$(/sbin/e-smith/config getprop mssql-server status)
+
+if [[ ! -d ${BACKUPDIR} ]]; then
+  /bin/mkdir ${BACKUPDIR}
+fi
+
+/bin/chown mssql:mssql ${BACKUPDIR}
+
+if [[ ${STATUS} != "enabled" ]]; then
+  echo "MsSQL Server is disabled - no tables dump" >&2
+  exit 0
+fi
+
+DATABASES=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -h -1 -Q "
+           SET NOCOUNT ON;
+           SELECT name 
+           FROM master.sys.databases 
+           WHERE name NOT IN ('master','model','msdb','tempdb')
+           AND state = 0
+           AND is_in_standby = 0;")
+
+for DB in $(echo ${DATABASES})
+do
+  /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
+  BACKUP DATABASE [${DB}] TO DISK = N'${BACKUPDIR}/${DB}.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10;
+  BACKUP LOG [${DB}] TO DISK = N'${BACKUPDIR}/${DB}_LOG.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-log', NOSKIP, NOREWIND, NOUNLOAD, STATS = 5;"
+done

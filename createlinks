@@ -24,11 +24,15 @@ use esmith::Build::CreateLinks  qw(:all);
 
 my $event;
 
+# mssql update event
+
 $event = "nethserver-mssql-update";
 
 event_actions($event, qw(
   initialize-default-databases 00
 ));
+
+# mssql save event
 
 $event = "nethserver-mssql-save";
 
@@ -41,4 +45,20 @@ event_actions($event, qw(
 event_services($event, qw(
   mssql-server restart
   shorewall reload
+));
+
+# pre-backup-data
+
+$event = "pre-backup-data";
+
+event_actions($event, qw(
+  mssql-dump-tables 50
+));
+
+# post-backup-data
+
+$event = "post-backup-data";
+
+event_actions($event, qw(
+  mssql-delete-dumped-tables 50
 ));

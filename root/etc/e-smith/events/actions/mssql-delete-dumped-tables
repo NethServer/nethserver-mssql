@@ -20,19 +20,6 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-PRODUCT=$(/sbin/e-smith/config getprop mssql ProductId)
+BACKUPDIR="/var/lib/nethserver/backup/mssql"
 
-perl -e "use esmith::util; 
-         use NethServer::Password; 
-         NethServer::Password::store('mssql');"
-
-PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
-
-MSSQL_SA_PASSWORD=${PASSWORD} MSSQL_PID=${PRODUCT} SQL_ENABLE_AGENT='y' /opt/mssql/bin/mssql-conf -n setup accept-eula
-echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-source ~/.bashrc
-
-/sbin/e-smith/config setprop mssql-server status enabled
-
-/opt/mssql/bin/mssql-conf set sqlagent.enabled true
+/bin/rm ${BACKUPDIR}/*.bak
