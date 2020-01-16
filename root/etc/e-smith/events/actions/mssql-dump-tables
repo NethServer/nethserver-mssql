@@ -24,28 +24,36 @@ PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
 BACKUPDIR="/var/lib/nethserver/backup/mssql"
 STATUS=$(/sbin/e-smith/config getprop mssql-server status)
 
+# check if backup dir exists
 if [[ ! -d ${BACKUPDIR} ]]; then
   /bin/mkdir ${BACKUPDIR}
 fi
 
+# set right permissions on backup dir
 /bin/chown mssql:mssql ${BACKUPDIR}
 
+# check if mssql is enabled
 if [[ ${STATUS} != "enabled" ]]; then
   echo "MsSQL Server is disabled - no tables dump" >&2
   exit 0
 fi
 
+# get databases list
 DATABASES=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -h -1 -Q "
            SET NOCOUNT ON;
            SELECT name 
            FROM master.sys.databases 
-           WHERE name NOT IN ('master','model','msdb','tempdb')
+           WHERE name <> 'tempdb'
            AND state = 0
            AND is_in_standby = 0;")
 
+# create backup for all databases
 for DB in $(echo ${DATABASES})
 do
   /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
   BACKUP DATABASE [${DB}] TO DISK = N'${BACKUPDIR}/${DB}.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10;
   BACKUP LOG [${DB}] TO DISK = N'${BACKUPDIR}/${DB}_LOG.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-log', NOSKIP, NOREWIND, NOUNLOAD, STATS = 5;"
 done
+
+# save databases list
+echo ${DATABASES} > ${BACKUPDIR}/db-list

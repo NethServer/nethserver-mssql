@@ -20,7 +20,12 @@
 # along with NethServer.  If not, see COPYING.
 #
 
+# get mssql-tools repo
 curl -o /etc/yum.repos.d/msprod.repo https://packages.microsoft.com/config/rhel/7/prod.repo
+
+# remove old tools
 yum remove -y unixODBC-utf16 unixODBC-utf16-devel
+
+# install tools
 yum install -y mssql-server-fts
 ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel

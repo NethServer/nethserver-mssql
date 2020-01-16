@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
+BACKUPDIR="/var/lib/nethserver/backup/mssql"
+
+# check if master backup exists
+if [[ ! -d ${BACKUPDIR}/master.bak ]]; then
+  exit 0
+fi
+
+# set right permissions on backup dir
+/bin/chown -R mssql:mssql ${BACKUPDIR}
+
+# start mssql-server
+systemctl start mssql-server
+
+# restore master db
+/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
+RESTORE DATABASE [master] FROM DISK = N'${BACKUPDIR}/master.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5;
+RESTORE LOG [master] FROM DISK = N'${BACKUPDIR}/master_LOG.bak';"
+
+# delete master backup
+/bin/rm ${BACKUPDIR}/master.bak
+/bin/rm ${BACKUPDIR}/master_LOG.bak
+
+# read databases list
+INPUT="${BACKUPDIR}/db-list"
+
+# restore all databases
+while IFS= read -r DB
+do
+  if [[ ${DB} != 'master' ]]; then
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
+    RESTORE DATABASE [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5;
+    RESTORE LOG [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}_LOG.bak';"
+  fi
+done < ${INPUT}

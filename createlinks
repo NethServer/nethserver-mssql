@@ -62,3 +62,32 @@ $event = "post-backup-data";
 event_actions($event, qw(
   mssql-delete-dumped-tables 50
 ));
+
+# pre-restore-config
+
+$event = "pre-restore-config";
+
+event_actions($event, qw(
+  nethserver-mssql-save-password 50
+));
+
+# post-restore-config
+
+$event = "post-restore-config";
+
+event_actions($event, qw(
+  nethserver-mssql-restore-config 50
+));
+
+# post-restore-data
+
+$event = "post-restore-data";
+
+event_actions($event, qw(
+  mssql-restore-tables 10
+  mssql-delete-dumped-tables 60
+));
+
+event_services($event, qw(
+  mssql-server restart
+));

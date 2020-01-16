@@ -22,4 +22,10 @@
 
 BACKUPDIR="/var/lib/nethserver/backup/mssql"
 
+# remove all .bak files from backup dir
 /bin/rm ${BACKUPDIR}/*.bak
+
+# remove databases list
+if [[ -f ${BACKUPDIR}/db-list ]]; then
+  /bin/rm ${BACKUPDIR}/db-list
+fi

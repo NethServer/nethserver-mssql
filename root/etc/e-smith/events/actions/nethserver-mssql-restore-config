@@ -20,25 +20,22 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-PRODUCT=$(/sbin/e-smith/config getprop mssql ProductId)
+# check if mssql is configured
+if [[ ! -f /var/opt/mssql/data/master.mdf ]]; then
+  exit 0
+fi
 
-# create a new password for mssql
-perl -e "use esmith::util; 
-         use NethServer::Password; 
-         NethServer::Password::store('mssql');"
+echo "[NOTICE] Restoring MsSQL SA password"
 
-PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
+# get current password (see nethserver-mssql-save-password action)
+CURPASSWORD=$(cat /var/lib/nethserver/secrets/mssql_current)
 
-# setup mssql-server
-MSSQL_SA_PASSWORD=${PASSWORD} MSSQL_PID=${PRODUCT} SQL_ENABLE_AGENT='y' /opt/mssql/bin/mssql-conf -n setup accept-eula
+# read password from backup-config
+NEWPASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
 
-# export path
-echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-source ~/.bashrc
+# restore new password in SQL
+/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${CURPASSWORD} -Q "
+ALTER LOGIN [SA] WITH PASSWORD = N'${NEWPASSWORD}';"
 
-# enable mssql-server on boot
-/sbin/e-smith/config setprop mssql-server status enabled
-
-# enable sqlagent
-/opt/mssql/bin/mssql-conf set sqlagent.enabled true
+# delete current password
+/bin/rm /var/lib/nethserver/secrets/mssql_current
