@@ -24,34 +24,79 @@ PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
 BACKUPDIR="/var/lib/nethserver/backup/mssql"
 
 # check if master backup exists
-if [[ ! -d ${BACKUPDIR}/master.bak ]]; then
+if [[ ! -f ${BACKUPDIR}/master.bak ]]; then
   exit 0
 fi
 
 # set right permissions on backup dir
 /bin/chown -R mssql:mssql ${BACKUPDIR}
 
-# start mssql-server
-systemctl start mssql-server
+if systemctl is-active --quiet mssql-server.service; then
+  # stop mssql-server if is active
+  systemctl stop mssql-server.service
+  
+  # wait mssql stop
+  sleep 5
+fi
 
-# restore master db
+# disable sqlagent
+/opt/mssql/bin/mssql-conf set sqlagent.enabled false
+
+# start mssql-server in single user mode
+systemd-run --setenv=HOME=/root --unit='mssql-single' --uid='mssql' /opt/mssql/bin/sqlservr -m
+
+# wait mssql start
+while !(systemctl status mssql-single.service --lines=30 | grep 'Recovery is complete') do
+  sleep 1
+done
+
+# restore master databases
 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
-RESTORE DATABASE [master] FROM DISK = N'${BACKUPDIR}/master.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5;
-RESTORE LOG [master] FROM DISK = N'${BACKUPDIR}/master_LOG.bak';"
+RESTORE DATABASE [master] FROM DISK = N'${BACKUPDIR}/master.bak' WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 5;"
 
-# delete master backup
-/bin/rm ${BACKUPDIR}/master.bak
-/bin/rm ${BACKUPDIR}/master_LOG.bak
+if systemctl is-active --quiet mssql-single.service; then
+  # stop mssql-server if is active
+  systemctl stop mssql-single.service
+fi
 
-# read databases list
-INPUT="${BACKUPDIR}/db-list"
+# wait mssql stop
+sleep 5
 
-# restore all databases
-while IFS= read -r DB
+# enable sqlagent
+/opt/mssql/bin/mssql-conf set sqlagent.enabled true
+
+# start mssql-server normally
+systemctl restart mssql-server.service
+
+# wait mssql start
+while !(systemctl status mssql-server.service --lines=30 | grep 'Recovery is complete') do
+  sleep 1
+done
+
+# restore databases
+for DB in $(cat ${BACKUPDIR}/db-list)
 do
-  if [[ ${DB} != 'master' ]]; then
-    /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
-    RESTORE DATABASE [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5;
-    RESTORE LOG [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}_LOG.bak';"
+  # avoid master restore
+  if [[ ${DB} != "master" ]]; then
+  
+    # check if are sysdb
+    if [[ ${DB} != "model" ]] && [[ ${DB} != "msdb" ]]; then
+      # drop existing database
+      QUERY="DROP DATABASE IF EXISTS ${DB};"
+      # prepare restore query
+      QUERY="${QUERY} RESTORE DATABASE [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}.bak' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5;"
+      # restore logs if db are not sysdb
+      QUERY="${QUERY} RESTORE LOG [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}_LOG.bak';"
+    else
+      # set single-user db
+      QUERY="ALTER DATABASE ${DB} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;"
+      # prepare restore query for sysdb
+      QUERY="${QUERY} RESTORE DATABASE [${DB}] FROM DISK = N'${BACKUPDIR}/${DB}.bak' WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 5;"
+      # set multi-user db
+      QUERY="${QUERY} ALTER DATABASE ${DB} SET MULTI_USER;"
+    fi
+    
+    # execute query
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "${QUERY}"
   fi
-done < ${INPUT}
+done

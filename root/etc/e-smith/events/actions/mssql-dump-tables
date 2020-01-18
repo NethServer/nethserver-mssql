@@ -47,13 +47,33 @@ DATABASES=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -h -1 
            AND state = 0
            AND is_in_standby = 0;")
 
+# remove old db-list file
+if [[ -f ${BACKUPDIR}/db-list ]]; then
+  /bin/rm ${BACKUPDIR}/db-list
+fi
+
 # create backup for all databases
 for DB in $(echo ${DATABASES})
 do
-  /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
-  BACKUP DATABASE [${DB}] TO DISK = N'${BACKUPDIR}/${DB}.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10;
-  BACKUP LOG [${DB}] TO DISK = N'${BACKUPDIR}/${DB}_LOG.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-log', NOSKIP, NOREWIND, NOUNLOAD, STATS = 5;"
+  # clean query string
+  QUERY=""
+
+  # set recovery full for non-system db
+  if [[ ${DB} != "master" ]] && [[ ${DB} != "model" ]] && [[ ${DB} != "msdb" ]]; then
+    QUERY="${QUERY} ALTER DATABASE [${DB}] SET RECOVERY FULL;"
+  fi
+
+  # preare backup query
+  QUERY="${QUERY} BACKUP DATABASE [${DB}] TO DISK = N'${BACKUPDIR}/${DB}.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10;"
+  
+  # backup logs for non-system db
+  if [[ ${DB} != "master" ]] && [[ ${DB} != "model" ]] && [[ ${DB} != "msdb" ]]; then
+    QUERY="${QUERY} BACKUP LOG [${DB}] TO DISK = N'${BACKUPDIR}/${DB}_LOG.bak' WITH NOFORMAT, NOINIT, NAME = '${DB}-log', NOSKIP, NOREWIND, NOUNLOAD, STATS = 10;"
+  fi
+  
+  # execute query
+  /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "${QUERY}"
 done
 
-# save databases list
+# save into databases list
 echo ${DATABASES} > ${BACKUPDIR}/db-list
