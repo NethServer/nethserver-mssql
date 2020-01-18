@@ -55,6 +55,9 @@ fi
 # create backup for all databases
 for DB in $(echo ${DATABASES})
 do
+  
+  echo "[NOTICE] Backupping ${DB} database"
+
   # clean query string
   QUERY=""
 

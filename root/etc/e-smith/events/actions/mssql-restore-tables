@@ -50,6 +50,8 @@ while !(systemctl status mssql-single.service --lines=30 | grep 'Recovery is com
   sleep 1
 done
 
+echo "[NOTICE] Restoring master database"
+
 # restore master databases
 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${PASSWORD} -Q "
 RESTORE DATABASE [master] FROM DISK = N'${BACKUPDIR}/master.bak' WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 5;"
@@ -66,7 +68,7 @@ sleep 5
 /opt/mssql/bin/mssql-conf set sqlagent.enabled true
 
 # start mssql-server normally
-systemctl restart mssql-server.service
+systemctl start mssql-server.service
 
 # wait mssql start
 while !(systemctl status mssql-server.service --lines=30 | grep 'Recovery is complete') do
@@ -78,7 +80,9 @@ for DB in $(cat ${BACKUPDIR}/db-list)
 do
   # avoid master restore
   if [[ ${DB} != "master" ]]; then
-  
+    
+    echo "[NOTICE] Restoring ${DB} database"
+    
     # check if are sysdb
     if [[ ${DB} != "model" ]] && [[ ${DB} != "msdb" ]]; then
       # drop existing database
