@@ -1,0 +1,10 @@
+#
+# nsapi_nethserver_mssql
+#
+Cmnd_Alias NSAPI_NETHSERVER_MSSQL = \
+  /usr/libexec/nethserver/api/nethserver-mssql/dashboard/read, \
+  /usr/libexec/nethserver/api/nethserver-mssql/settings/read, \
+  /usr/libexec/nethserver/api/nethserver-mssql/settings/update, \
+  /usr/libexec/nethserver/api/nethserver-mssql/settings/validate
+
+Defaults!NSAPI_NETHSERVER_MSSQL !requiretty
