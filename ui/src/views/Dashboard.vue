@@ -1,3 +1,25 @@
+<!--
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+-->
+
 <template>
   <div>
     <h2>{{$t('dashboard.title')}}</h2>
@@ -12,55 +34,60 @@
 
     <div v-show="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-show="uiLoaded">
-      <div class="row rowstats">
-        <div class="content">
-          <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
-            <span class="card-pf-utilization-card-details-count stats-count">{{configuration.active_users}}</span>
-            <span class="card-pf-utilization-card-details-description stats-description">
-              <span
-                class="card-pf-utilization-card-details-line-2 stats-text"
-              >{{$t('dashboard.active_users')}}</span>
-            </span>
+      <div v-if="status.installed">
+        <div class="row rowstats">
+          <div class="content">
+            <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
+              <span class="card-pf-utilization-card-details-count stats-count">{{status.version}}</span>
+              <span class="card-pf-utilization-card-details-description stats-description">
+                <span
+                  class="card-pf-utilization-card-details-line-2 stats-text"
+                >{{$t('dashboard.mssql_version')}}</span>
+              </span>
+            </div>
           </div>
-          <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
-            <span class="card-pf-utilization-card-details-count stats-count">{{configuration.active_admins}}</span>
-            <span class="card-pf-utilization-card-details-description stats-description">
-              <span
-                class="card-pf-utilization-card-details-line-2 stats-text"
-              >{{$t('dashboard.active_admins')}}</span>
-            </span>
+        </div>
+        <div class="row rowstats">
+          <div class="content">
+            <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
+              <span class="card-pf-utilization-card-details-count stats-count">
+                <span
+                  :class="status.isrunning ? 'fa fa-check green' : 'fa fa-times red'"
+                ></span>
+              </span>
+              <span class="card-pf-utilization-card-details-description stats-description">
+                <span
+                  class="card-pf-utilization-card-details-line-2 stats-text"
+                >{{$t('dashboard.mssql_status')}}</span>
+              </span>
+            </div>
           </div>
-          <a
-            target="_blank"
-            :href="configuration.public_url"
-            class="btn btn-primary btn-lg open-app"
-          >{{$t('dashboard.open_app')}}</a>
+        </div>
+        <div class="row rowstats">
+          <div class="content">
+            <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
+              <span class="card-pf-utilization-card-details-count stats-count">{{status.databases_number}}</span>
+              <span class="card-pf-utilization-card-details-description stats-description">
+                <span
+                  class="card-pf-utilization-card-details-line-2 stats-text"
+                >{{status.databases_number == 1 ? $t('dashboard.database') : $t('dashboard.databases')}}</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-          <h3 class="space">{{ $t('dashboard.webtop_modules_version') }}</h3>
-          <form class="form-horizontal">
-            <span v-for="(item, key) in configuration.version" :key="key">
-              <div class="form-group">
-                <label class="col-sm-4 control-label">
-                  {{$t('dashboard.webtop_' + key)}}
-                </label>
-                <div class="col-sm-5 item">
-                  {{item}}
-                </div>
-              </div>
-            </span>
-          </form>
-        </div>
-      </div>
-      <div v-show="configuration.admin_pass_warn" class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-          <h3 class="space">{{ $t('dashboard.webtop_admin_password') }}</h3>
-          <div class="alert alert-warning">
-            <span class="pficon pficon-warning-triangle-o"></span>
-            <strong>{{$t('dashboard.warning')}}:</strong>
-            {{$t('dashboard.change_default_password')}}
+      <div v-else>
+        <div class="blank-slate-pf" id>
+          <div class="blank-slate-pf-icon">
+            <span class="pficon pficon pficon-add-circle-o"></span>
+          </div>
+          <h1>{{$t('package_required')}}</h1>
+          <p>{{$t('package_required_desc')}}.</p>
+          <pre>mssql-server</pre>
+          <div class="blank-slate-pf-main-action">
+            <router-link to="/settings">
+              <button class="btn btn-primary btn-lg">{{$t('install_package')}}</button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -82,11 +109,11 @@ export default {
     return {
       uiLoaded: false,
       errorMessage: null,
-      configuration: {
-        active_users: 0,
-        version: {},
-        public_url: null,
-        admin_pass_warn: false
+      status: {
+        installed: false,
+        version: null,
+        isrunning: false,
+        databases_number: 0
       }
     };
   },
@@ -102,27 +129,19 @@ export default {
       var context = this;
       context.uiLoaded = false;
       nethserver.exec(
-        ["nethserver-webtop5/dashboard/read"],
-        { action: "configuration" },
+        ["nethserver-mssql/dashboard/read"],
+        { action: "status" },
         null,
         function(success) {
           try {
-            context.configuration = JSON.parse(success).configuration;
-            
-            var sorted = {};
-            Object.keys(context.configuration.version).sort().forEach(function(key) {
-              sorted[key] = context.configuration.version[key];
-            });
-            context.configuration.version = sorted;
-            
-            context.configuration.public_url = "http://" + window.location.host.split(":")[0] + "/webtop";
+            context.status = JSON.parse(success).status;
           } catch (e) {
             console.error(e);
           }
           context.uiLoaded = true;
         },
         function(error) {
-          context.showErrorMessage(context.$i18n.t("dashboard.error_reading_webtop5_configuration"), error);
+          context.showErrorMessage(context.$i18n.t("dashboard.error_reading_mssql_status"), error);
         }
       );
     }
@@ -183,12 +202,6 @@ export default {
   margin-right: 10px;
   float: left;
   line-height: 1;
-}
-.open-app {
-  float: right;
-  position: absolute;
-  top: 16px;
-  right: 20px;
 }
 .item {
   padding-top: 3px;

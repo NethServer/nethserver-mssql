@@ -1,5 +1,6 @@
 {
     "settings": {
+        "title": "Settings"
     },
     "about": {
         "title": "About",
@@ -18,7 +19,12 @@
     },
     "dashboard":{
         "title": "Microsoft SQL Server dashboard",
-        "app": "MsSQL"
+        "app": "MsSQL",
+        "mssql_version": "SQL Server version",
+        "database": "Database",
+        "databases": "Databases",
+        "mssql_status": "SQL Server status",
+        "error_reading_mssql_status": "Error while reading Microsoft SQL Server status"
     },
     "docs": {
     },
@@ -29,5 +35,8 @@
     "of": "of",
     "rows_per_page": "Rows per page",
     "search": "Search",
-    "all": "All"
+    "all": "All",
+    "package_required": "Missing packages",
+    "package_required_desc": "To access this page you have to install the required packages listed below",
+    "install_package": "Install package"
 }

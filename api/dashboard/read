@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use NethServer::Password;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+my $ret = {};
+
+if ($cmd eq 'status') {
+  
+  my $out = `rpm -q --quiet mssql-server`;
+  
+  if ($? == 0) {
+    
+    $ret->{'status'}{'installed'} = 1;
+    
+    $out = `rpm -q --queryformat '%{VERSION}' mssql-server`;
+    $ret->{'status'}{'version'} = $out;
+    
+    $out = `systemctl is-active mssql-server`;
+    $ret->{'status'}{'isrunning'} = ($? == 0)? 1 : 0;
+    
+    my $password = NethServer::Password::store("mssql");
+    
+    my $dbnumber = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -h -1 -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.databases;"`;
+    $dbnumber =~ s/^\s+|\s+$//g;
+    $ret->{'status'}{'databases_number'} = $dbnumber;
+
+  } else {
+    $ret->{'status'}{'installed'} = 0;
+  }
+  
+} else {
+    error();
+}
+
+print encode_json($ret);
