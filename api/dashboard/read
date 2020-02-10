@@ -39,13 +39,14 @@ if ($cmd eq 'status') {
     
     $ret->{'status'}{'installed'} = 1;
     
-    $out = `rpm -q --queryformat '%{VERSION}' mssql-server`;
-    $ret->{'status'}{'version'} = $out;
+    my $password = NethServer::Password::store("mssql");
+    
+    my $version = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -h -1 -Q "SET NOCOUNT ON; SELECT SERVERPROPERTY('ProductVersion');"`;
+    $version =~ s/^\s+|\s+$//g;
+    $ret->{'status'}{'version'} = $version;
     
     $out = `systemctl is-active mssql-server`;
     $ret->{'status'}{'isrunning'} = ($? == 0)? 1 : 0;
-    
-    my $password = NethServer::Password::store("mssql");
     
     my $dbnumber = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -h -1 -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.databases;"`;
     $dbnumber =~ s/^\s+|\s+$//g;

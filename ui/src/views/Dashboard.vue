@@ -52,7 +52,7 @@
             <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <span class="card-pf-utilization-card-details-count stats-count">
                 <span
-                  :class="status.isrunning ? 'fa fa-check green' : 'fa fa-times red'"
+                  :class="status.isrunning ? 'fa fa-check text-success' : 'fa fa-times text-danger'"
                 ></span>
               </span>
               <span class="card-pf-utilization-card-details-description stats-description">

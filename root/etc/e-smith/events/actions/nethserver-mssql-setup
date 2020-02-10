@@ -20,7 +20,7 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-PRODUCT=$(/sbin/e-smith/config getprop mssql ProductId)
+PRODUCT=$(/sbin/e-smith/config getprop mssql-server ProductId)
 
 # create a new password for mssql
 perl -e "use esmith::util; 
