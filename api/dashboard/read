@@ -41,7 +41,10 @@ if ($cmd eq 'status') {
     
     my $password = NethServer::Password::store("mssql");
     
-    my $version = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -h -1 -Q "SET NOCOUNT ON; SELECT SERVERPROPERTY('ProductVersion');"`;
+    my $version = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P test -h -1 -Q "SET NOCOUNT ON; SELECT SERVERPROPERTY('ProductVersion');"`;
+    
+    $ret->{'status'}{'salogin'} = ($? == 0)? 1 : 0;
+    
     $version =~ s/^\s+|\s+$//g;
     $ret->{'status'}{'version'} = $version;
     

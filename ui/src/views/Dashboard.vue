@@ -34,7 +34,7 @@
 
     <div v-show="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-show="uiLoaded">
-      <div v-if="status.installed">
+      <div v-if="status.installed && status.salogin">
         <div class="row rowstats">
           <div class="content">
             <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -76,7 +76,14 @@
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else-if="status.installed && !status.salogin">
+        <div class="alert alert-warning">
+          <span class="pficon pficon-warning-triangle-o"></span>
+          <strong>{{$t('dashboard.unable_to_connect')}}:</strong>
+          {{$t('dashboard.check_sql_or_sa_password')}}.
+        </div>
+      </div>
+      <div v-else-if="!status.installed">
         <div class="blank-slate-pf" id>
           <div class="blank-slate-pf-icon">
             <span class="pficon pficon pficon-add-circle-o"></span>
