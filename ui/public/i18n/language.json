@@ -26,7 +26,8 @@
         "mssql_status": "SQL Server status",
         "error_reading_mssql_status": "Error while reading Microsoft SQL Server status",
         "unable_to_connect": "Unable to connect to SQL Server",
-        "check_sql_or_sa_password": "Please check if SQL Server is running. If you have changed SA password without the correct NethServer event fill /var/lib/nethserver/secrets/mssql file with the correct SA password."
+        "check_sql_or_sa_password": "Please check if SQL Server is running. If you have changed SA password without the correct NethServer event restore the correct password with this command",
+        "command_to_change_pwd": "or use this command to change properly the password with a custom password"
     },
     "docs": {
     },

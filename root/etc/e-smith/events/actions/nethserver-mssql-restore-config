@@ -27,15 +27,16 @@ fi
 
 echo "[NOTICE] Restoring MsSQL SA password"
 
-# get current password (see nethserver-mssql-save-password action)
-CURPASSWORD=$(cat /var/lib/nethserver/secrets/mssql_current)
+if systemctl is-active --quiet mssql-server.service; then
+  # stop mssql-server if is active
+  systemctl stop mssql-server.service
+  
+  # wait mssql stop
+  sleep 5
+fi
 
 # read password from backup-config
 NEWPASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
 
 # restore new password in SQL
-/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${CURPASSWORD} -Q "
-ALTER LOGIN [SA] WITH PASSWORD = N'${NEWPASSWORD}';"
-
-# delete current password
-/bin/rm /var/lib/nethserver/secrets/mssql_current
+MSSQL_SA_PASSWORD=${NEWPASSWORD} /opt/mssql/bin/mssql-conf set-sa-password

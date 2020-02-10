@@ -63,14 +63,6 @@ event_actions($event, qw(
   mssql-delete-dumped-tables 50
 ));
 
-# pre-restore-config
-
-$event = "pre-restore-config";
-
-event_actions($event, qw(
-  nethserver-mssql-save-password 50
-));
-
 # post-restore-config
 
 $event = "post-restore-config";
