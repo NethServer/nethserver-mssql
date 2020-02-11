@@ -27,5 +27,5 @@ curl -o /etc/yum.repos.d/msprod.repo https://packages.microsoft.com/config/rhel/
 yum remove -y unixODBC-utf16 unixODBC-utf16-devel
 
 # install tools
-yum install -y mssql-server-fts | /usr/libexec/nethserver/ptrack-mssql-install
-ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel | /usr/libexec/nethserver/ptrack-mssql-install
+yum install -y mssql-server-fts
+ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel

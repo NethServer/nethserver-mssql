@@ -25,5 +25,5 @@ curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config
 
 # install mssql-server if not installed
 if ! rpm -q --quiet mssql-server; then
-  yum install -y mssql-server | /usr/libexec/nethserver/ptrack-mssql-install
+  yum install -y mssql-server
 fi
