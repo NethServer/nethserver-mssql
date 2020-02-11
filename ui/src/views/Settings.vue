@@ -38,245 +38,46 @@
       <form class="form-horizontal" v-on:submit.prevent="saveConfig()">
         <div class="row">
           <div class="col-lg-12">
-            <div :class="['form-group margintop', errors.DefaultLocale.hasError ? 'has-error' : '']">
+            <div :class="['form-group margintop', errors.ProductId.hasError ? 'has-error' : '']">
               <label class="col-sm-2 control-label">
-                {{$t('settings.default_locale')}}
+                {{$t('settings.mssql_edition')}}
                 <doc-info
                   :placement="'top'"
-                  :title="$t('settings.default_locale')"
-                  :chapter="'DefaultLocale'"
+                  :title="$t('settings.mssql_edition')"
+                  :chapter="'MssqlEdition'"
                   :inline="true"
                 ></doc-info>
               </label>
               <div class="col-sm-5">
                 <select
                   required
-                  v-model="configuration.DefaultLocale"
+                  v-model="configuration.ProductId"
                   class="combobox form-control"
                 >
-                  <option v-for="(t,i) in configuration.LocaleList" v-bind:key="i">{{t}}</option>
+                  <option value="key">{{$t('settings.insert_a_key')}}</option>
+                  <option value="evaluation">Evaluation</option>
+                  <option value="developer">Developer</option>
+                  <option value="express">Express</option>
+                  <option value="web">Web</option>
+                  <option value="standard">Standard</option>
+                  <option value="enterprise">Enterprise</option>
                 </select>
-                <span v-if="errors.DefaultLocale.hasError" class="help-block">{{$t('settings.not_valid_default_locale')}}</span>
+                <span v-if="errors.ProductId.hasError" class="help-block">{{$t('settings.not_valid_edition')}}</span>
               </div>
             </div>
-            <div :class="['form-group', errors.DefaultTimezone.hasError ? 'has-error' : '']">
-              <label class="col-sm-2 control-label">
-                {{$t('settings.default_timezone')}}
-                <doc-info
-                  :placement="'top'"
-                  :title="$t('settings.default_timezone')"
-                  :chapter="'DefaultTimezone'"
-                  :inline="true"
-                ></doc-info>
-              </label>
+            <div :class="['form-group margintop', errors.ProductKey.hasError ? 'has-error' : '']">
+              <label class="col-sm-2 control-label"></label>
               <div class="col-sm-5">
-                <select
-                  required
-                  v-model="configuration.DefaultTimezone"
-                  class="combobox form-control"
+                <input
+                  v-model="configuration.ProductKey"
+                  type="text"
+                  class="form-control"
+                  :disabled="configuration.ProductId != 'key'"
+                  :placeholder="$t('settings.product_key')"
                 >
-                  <option v-for="(t,i) in configuration.TimezonesList" v-bind:key="i">{{t}}</option>
-                </select>
-                <span v-if="errors.DefaultTimezone.hasError" class="help-block">{{$t('settings.not_valid_default_timezone')}}</span>
+                <span v-if="errors.ProductKey.hasError" class="help-block">{{$t('settings.not_valid_key')}}</span>
               </div>
             </div>
-            <div :class="['form-group', errors.DefaultToolbarIconsSize.hasError ? 'has-error' : '']">
-              <label class="col-sm-2 control-label">
-                {{$t('settings.default_toolbar_icons_size')}}
-                <doc-info
-                  :placement="'top'"
-                  :title="$t('settings.default_toolbar_icons_size')"
-                  :chapter="'DefaultToolbarIconsSize'"
-                  :inline="true"
-                ></doc-info>
-              </label>
-              <div class="col-sm-5">
-                <select
-                  required
-                  v-model="configuration.DefaultToolbarIconsSize"
-                  class="combobox form-control"
-                >
-                  <option value="small">{{$t('settings.small')}}</option>
-                  <option value="medium">{{$t('settings.medium')}}</option>
-                  <option value="large">{{$t('settings.large')}}</option>
-                </select>
-                <span v-if="errors.DefaultToolbarIconsSize.hasError" class="help-block">{{$t('settings.not_valid_default_toolbar_icons_size')}}</span>
-              </div>
-            </div>
-            
-            <!-- advanced menu -->
-            <legend class="fields-section-header-pf" aria-expanded="true">
-              <span
-                :class="['fa fa-angle-right field-section-toggle-pf', advanced ? 'fa-angle-down' : '']"
-              ></span>
-              <a
-                class="field-section-toggle-pf"
-                @click="toggleAdvancedMode()"
-              >{{$t('settings.advanced_mode')}}</a>
-            </legend>
-            <div v-if="advanced">
-              <div :class="['form-group margintop', errors.SmtpAuth.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.smtp_auth')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.smtp_auth')"
-                    :chapter="'SmtpAuth'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    v-model="configuration.SmtpAuth"
-                    type="checkbox"
-                    class="form-control"
-                    true-value="enabled"
-                    false-value="disabled"
-                  >
-                  <span v-if="errors.SmtpAuth.hasError" class="help-block">{{$t('settings.not_valid_smtp_auth')}}</span>
-                </div>
-              </div>
-              <div :class="['form-group', errors.SmtpStarttls.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.smtp_starttls')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.smtp_starttls')"
-                    :chapter="'SmtpStarttls'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    v-model="configuration.SmtpStarttls"
-                    type="checkbox"
-                    class="form-control"
-                    true-value="enabled"
-                    false-value="disabled"
-                  >
-                  <span v-if="errors.SmtpStarttls.hasError" class="help-block">{{$t('settings.not_valid_smtp_starttls')}}</span>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.pbx_provider')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.pbx_provider')"
-                    :chapter="'PbxProvider'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="configuration.PbxProvider"
-                  >
-                </div>
-              </div>
-              <div :class="['form-group', errors.PbxProviderNethvoiceWebrestUrl.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.nethvoice_webrest_url')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.nethvoice_webrest_url')"
-                    :chapter="'PbxProviderNethvoiceWebrestUrl'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="configuration.PbxProviderNethvoiceWebrestUrl"
-                  >
-                  <span v-if="errors.PbxProviderNethvoiceWebrestUrl.hasError" class="help-block">{{$t('settings.not_valid_nethvoice_webrest_url')}}</span>
-                </div>
-              </div>
-              <div :class="['form-group', errors.MinMemory.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.min_memory')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.min_memory')"
-                    :chapter="'MinMemory'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="number"
-                    class="form-control"
-                    v-model="configuration.MinMemory"
-                    required
-                  >
-                  <span v-if="errors.MinMemory.hasError" class="help-block">{{$t('settings.not_a_number_min')}}</span>
-                </div>
-              </div>
-              <div :class="['form-group', errors.MaxMemory.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.max_memory')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.max_memory')"
-                    :chapter="'MaxMemory'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="number"
-                    class="form-control"
-                    v-model="configuration.MaxMemory"
-                    required
-                  >
-                  <span v-if="errors.MaxMemory.hasError" class="help-block">{{$t('settings.not_a_number_max')}}</span>
-                </div>
-              </div>
-              <div :class="['form-group', errors.PublicUrl.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.public_url')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.public_url')"
-                    :chapter="'PublicUrl'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="configuration.PublicUrl"
-                    :placeholder="configuration.PlaceholderPublicUrl"
-                  >
-                  <span v-if="errors.PublicUrl.hasError" class="help-block">{{$t('settings.not_valid_public_url')}}</span>
-                </div>
-              </div>
-              <div :class="['form-group', errors.DavServerUrl.hasError ? 'has-error' : '']">
-                <label class="col-sm-2 control-label">
-                  {{$t('settings.dav_server_url')}}
-                  <doc-info
-                    :placement="'top'"
-                    :title="$t('settings.dav_server_url')"
-                    :chapter="'DavServerUrl'"
-                    :inline="true"
-                  ></doc-info>
-                </label>
-                <div class="col-sm-5">
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="configuration.DavServerUrl"
-                    :placeholder="configuration.PlaceholderDavServerUrl"
-                  >
-                  <span v-if="errors.DavServerUrl.hasError" class="help-block">{{$t('settings.not_valid_dav_server_url')}}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- save button -->
             <div class="form-group">
               <label class="col-sm-2 control-label">
               </label>
@@ -284,6 +85,7 @@
                 <button 
                   class="btn btn-primary margintop" 
                   type="submit"
+                  :disabled="configuration.ProductId == 'key' && configuration.ProductKey == ''"
                 >
                   {{$t('save')}}
                 </button>
@@ -292,6 +94,15 @@
           </div>
         </div>
       </form>
+      <div v-if="configuration.installed && configuration.isrunning" class="margintop">
+      </div>
+      <div v-else-if="configuration.installed" class="margintop">
+        <div class="alert alert-warning">
+          <span class="pficon pficon-warning-triangle-o"></span>
+          <strong>{{$t('settings.mssql_is_not_running')}}:</strong>
+          {{$t('settings.check_sql_service')}}.
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -307,24 +118,12 @@ export default {
       uiLoaded: false,
       errorMessage: null,
       configuration: {
-        DefaultLocale: 'en_US',
-        DefaultTimezone: 'Etc/UTC',
-        DefaultToolbarIconsSize: 'medium',
-        SmtpAuth: 'disabled',
-        SmtpStarttls: 'disabled',
-        PublicUrl: null,
-        DavServerUrl: null,
-        LocaleList: null,
-        TimezonesList: null,
-        PbxProvider: null,
-        PbxProviderNethvoiceWebrestUrl: null,
-        MinMemory: 512,
-        MaxMemory: 1024,
-        PlaceholderPublicUrl: null,
-        PlaceholderDavServerUrl: null
+        ProductId: "express",
+        ProductKey: null,
+        installed: false,
+        isrunning: false
       },
-      errors: this.initErrors(),
-      advanced: false
+      errors: this.initErrors()
     }
   },
   methods: {
@@ -339,7 +138,7 @@ export default {
       var context = this;
       context.uiLoaded = false;
       nethserver.exec(
-        ["nethserver-webtop5/settings/read"],
+        ["nethserver-mssql/settings/read"],
         { action: "configuration" },
         null,
         function(success) {
@@ -351,7 +150,7 @@ export default {
           context.uiLoaded = true;
         },
         function(error) {
-          context.showErrorMessage(context.$i18n.t("settings.error_reading_webtop5_configuration"), error);
+          context.showErrorMessage(context.$i18n.t("settings.error_reading_mssql_configuration"), error);
         }
       );
     },
@@ -360,23 +159,14 @@ export default {
       var settingsObj = {
         action: "edit",
         "configuration": {
-          DefaultLocale: context.configuration.DefaultLocale,
-          DefaultTimezone: context.configuration.DefaultTimezone,
-          DefaultToolbarIconsSize: context.configuration.DefaultToolbarIconsSize,
-          SmtpAuth: context.configuration.SmtpAuth,
-          SmtpStarttls: context.configuration.SmtpStarttls,
-          PublicUrl: context.configuration.PublicUrl,
-          DavServerUrl: context.configuration.DavServerUrl,
-          PbxProvider: context.configuration.PbxProvider,
-          PbxProviderNethvoiceWebrestUrl: context.configuration.PbxProviderNethvoiceWebrestUrl,
-          MinMemory: context.configuration.MinMemory,
-          MaxMemory: context.configuration.MaxMemory
+          ProductId: context.configuration.ProductId,
+          ProductKey: context.configuration.ProductKey
         }
       };
       context.loaders = true;
       context.errors = context.initErrors();
       nethserver.exec(
-        ["nethserver-webtop5/settings/validate"],
+        ["nethserver-mssql/settings/validate"],
         settingsObj,
         null,
         function(success) {
@@ -392,10 +182,10 @@ export default {
           
           // update values
           nethserver.exec(
-            ["nethserver-webtop5/settings/update"],
+            ["nethserver-mssql/settings/update"],
             settingsObj,
             function(stream) {
-              console.info("nethserver-webtop5-update", stream);
+              console.info("nethserver-mssql-save", stream);
             },
             function(success) {
               context.getConfig();
@@ -426,51 +216,15 @@ export default {
     },
     initErrors() {
       return {
-        DefaultLocale: {
+        ProductId: {
           hasError: false,
           message: ""
         },
-        DefaultTimezone: {
-          hasError: false,
-          message: ""
-        },
-        DefaultToolbarIconsSize: {
-          hasError: false,
-          message: ""
-        },
-        SmtpAuth: {
-          hasError: false,
-          message: ""
-        },
-        SmtpStarttls: {
-          hasError: false,
-          message: ""
-        },
-        PublicUrl: {
-          hasError: false,
-          message: ""
-        },
-        DavServerUrl: {
-          hasError: false,
-          message: ""
-        },
-        PbxProviderNethvoiceWebrestUrl: {
-          hasError: false,
-          message: ""
-        },
-        MinMemory: {
-          hasError: false,
-          message: ""
-        },
-        MaxMemory: {
+        ProductKey: {
           hasError: false,
           message: ""
         }
       }
-    },
-    toggleAdvancedMode() {
-      this.advanced = !this.advanced;
-      this.$forceUpdate();
     }
   }
 };

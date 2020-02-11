@@ -21,6 +21,13 @@
 #
 
 PRODUCT=$(/sbin/e-smith/config getprop mssql-server ProductId)
+KEY=$(/sbin/e-smith/config getprop mssql-server ProductKey)
+
+if [ ${PRODUCT} = "key" ]; then
+  PID=${KEY}
+else
+  PID=${PRODUCT}
+fi
 
 # create a new password for mssql
 perl -e "use esmith::util; 
@@ -30,7 +37,7 @@ perl -e "use esmith::util;
 PASSWORD=$(cat /var/lib/nethserver/secrets/mssql)
 
 # setup mssql-server
-MSSQL_SA_PASSWORD=${PASSWORD} MSSQL_PID=${PRODUCT} SQL_ENABLE_AGENT='y' /opt/mssql/bin/mssql-conf -n setup accept-eula
+MSSQL_SA_PASSWORD=${PASSWORD} MSSQL_PID=${PID} SQL_ENABLE_AGENT='y' /opt/mssql/bin/mssql-conf -n setup accept-eula
 
 # export path
 echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
