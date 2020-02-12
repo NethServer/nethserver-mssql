@@ -23,6 +23,7 @@
 use strict;
 use warnings;
 use esmith::ConfigDB;
+use NethServer::Password;
 
 require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
 
@@ -49,6 +50,9 @@ if ($cmd eq 'configuration') {
   my $db = esmith::ConfigDB->open_ro();
   $ret->{'configuration'}{'ProductId'} = $db->get_prop('mssql-server', 'ProductId') || 'Express';
   $ret->{'configuration'}{'ProductKey'} = $db->get_prop('mssql-server', 'ProductKey') || '';
+  
+  my $password = NethServer::Password::store("mssql");
+  $ret->{'configuration'}{'sapassword'} = $password;
   
 } else {
     error();

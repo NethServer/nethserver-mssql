@@ -4,13 +4,25 @@
         "mssql_edition": "MsSQL Edition",
         "not_valid_edition": "Selected edition is not valid",
         "error_reading_mssql_configuration": "Error while reading Microsoft SQL Server configuration",
-        "settings_updated_ok": "Configuration update successful",
+        "settings_updated_ok": "Configuration updated successfully",
         "settings_updated_error": "Configuration update error",
         "mssql_is_not_running": "MsSQL Server is not running",
         "check_sql_service": "Check SQL Server and start the service",
         "not_valid_key": "Product Key is not valid",
         "insert_a_key": "Insert a Product Key",
-        "product_key": "Product Key"
+        "product_key": "Product Key",
+        "sa_user_mgmt": "SA user management",
+        "sa_password": "SA password",
+        "change_password": "Change password",
+        "change_sa_password": "Change SA password",
+        "password": "Password",
+        "confirm_password": "Confirm password",
+        "not_valid_password": "Password does not respect SQL Server criteria",
+        "password_updated_ok": "Password updated successfully",
+        "not_equal_password": "Passwords are not equals",
+        "notice": "Notice",
+        "password_must_respect_criteria": "Password must respect SQL Server criteria, otherwise password update will fails. Check password criteria",
+        "here": "here"
     },
     "about": {
         "title": "About",
@@ -18,6 +30,7 @@
         "bug_tracker": "Bug tracker"
     },
     "validation": {
+        "NotValidProductKey": "Product Key is not valid"
     },
     "logs": {
         "title": "Logs",
@@ -40,7 +53,8 @@
         "command_to_change_pwd": "or use this command to change properly the password with a custom password"
     },
     "docs": {
-        "MssqlEdition": "Choose SQL Server edition from the list or insert a Product Key."
+        "MssqlEdition": "Choose SQL Server edition from the list or insert a Product Key.",
+        "SaPassword": "Set the password for System Administrator user. If password update fails, check SQL Server password criteria."
     },
     "save": "Save",
     "cancel": "Cancel",
@@ -52,5 +66,6 @@
     "all": "All",
     "package_required": "Missing packages",
     "package_required_desc": "To access this page you have to install the required packages listed below",
-    "install_package": "Install package"
+    "install_package": "Install package",
+    "edit": "Edit"
 }

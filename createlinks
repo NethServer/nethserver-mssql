@@ -47,6 +47,14 @@ event_services($event, qw(
   shorewall reload
 ));
 
+# mssql change password event
+
+$event = "nethserver-mssql-change-password";
+
+event_actions($event, qw(
+  nethserver-mssql-change-password 50
+));
+
 # pre-backup-data
 
 $event = "pre-backup-data";

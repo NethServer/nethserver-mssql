@@ -2,7 +2,7 @@
 <?php
   
 /*
- * Copyright (C) 2019 Nethesis S.r.l.
+ * Copyright (C) 2020 Nethesis S.r.l.
  * http://www.nethesis.it - nethserver@nethesis.it
  *
  * This script is part of NethServer.
@@ -21,18 +21,44 @@
  * along with NethServer.  If not, see COPYING.
 */
 
-require_once("/usr/libexec/nethserver/api/lib/Helpers.php");
+require_once("/usr/libexec/nethserver/api/lib/users_functions.php");
 
-$data = readInput();
-$v = new LegacyValidator($data['configuration']);
 
-if ($data['configuration']['ProductId'] == 'key') {
-  $v->declareParameter('ProductKey', Validate::POSITIVE_INTEGER);
+function validateEdition($data) {
+  $v = new LegacyValidator($data['configuration']);
+  if ($data['configuration']['ProductId'] == 'key') {
+    $key = $data['configuration']['ProductKey'];
+    $arr = explode("-",$key);
+    if (count($arr) != 5 || strlen($arr[0]) != 5 || strlen($arr[1]) != 5 || strlen($arr[2]) != 5 || strlen($arr[3]) != 5 || strlen($arr[4]) != 5) {
+      $v->addValidationError('ProductKey', 'NotValidProductKey', $v->parameters['ProductKey']);
+    }
+  }
+
+  if ($v->validate()) {
+    success();
+  } else {
+    error($v);
+  }
 }
 
-# Validate the input
-if ($v->validate()) {
-  success();
+function validatePassword($data) {
+  $v = new LegacyValidator($data['password']);
+  
+  check_password($data, $v);
+
+  if ($v->validate()) {
+    success();
+  } else {
+    error($v);
+  }
+}
+
+$data = readInput();
+
+if($data['action'] == 'edit') {
+    validateEdition($data);
+} else if($data['action'] == 'change-password') {
+    validatePassword($data);
 } else {
-  error($v);
+    error();
 }

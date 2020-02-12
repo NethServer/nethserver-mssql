@@ -83,7 +83,7 @@
           {{$t('dashboard.check_sql_or_sa_password')}}
           <pre class='margintop'>MSSQL_SA_PASSWORD=$(cat /var/lib/nethserver/secrets/mssql) /opt/mssql/bin/mssql-conf set-sa-password</pre>
           {{$t('dashboard.command_to_change_pwd')}}
-          <pre class='margintop'>/etc/e-smith/events/actions/nethserver-mssql-change-password yournewpassword</pre>
+          <pre class='margintop'>signal-event nethserver-mssql-change-password yournewpassword</pre>
         </div>
       </div>
       <div v-else-if="!status.installed">
