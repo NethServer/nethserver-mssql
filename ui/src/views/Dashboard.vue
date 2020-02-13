@@ -52,7 +52,10 @@
             <div class="stats-container col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <span class="card-pf-utilization-card-details-count stats-count">
                 <span
-                  :class="status.isrunning ? 'fa fa-check text-success' : 'fa fa-times text-danger'"
+                  :class="status.isenabled  == 'enabled' ? 'fa fa-check text-success' : 'fa fa-times text-danger'"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  :title="status.isenabled  == 'enabled' ? $t('dashboard.enabled') : $t('dashboard.disabled')"
                 ></span>
               </span>
               <span class="card-pf-utilization-card-details-description stats-description">
@@ -122,7 +125,7 @@ export default {
       status: {
         installed: false,
         version: null,
-        isrunning: false,
+        isenabled: "disabled",
         databases_number: 0
       }
     };
@@ -145,6 +148,10 @@ export default {
         function(success) {
           try {
             context.status = JSON.parse(success).status;
+            
+            setTimeout(function() {
+              $('[data-toggle="tooltip"]').tooltip();
+            }, 250);
           } catch (e) {
             console.error(e);
           }

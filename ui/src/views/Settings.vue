@@ -143,6 +143,77 @@
             </div>
           </div>
         </form>
+        <div class="modal" id="changePwdModal" tabindex="-1" role="dialog" data-backdrop="static">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">
+                  {{$t('settings.change_sa_password')}}
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-info">
+                  <span class="pficon pficon pficon-info"></span>
+                  <strong>{{$t('settings.notice')}}:</strong>
+                  {{$t('settings.password_must_respect_criteria')}} <a href='https://docs.microsoft.com/en-US/sql/relational-databases/security/password-policy' target='_blank'>{{$t('settings.here')}}</a>.
+                </div>
+                <form
+                  class="form-horizontal"
+                  v-on:submit.prevent="changePassword()"
+                >
+                  <div :class="['form-group margintop', errors.newPassword.hasError ? 'has-error' : '']">
+                    <label class="col-sm-3 control-label">
+                      {{$t('settings.password')}}
+                    </label>
+                    <div class="col-sm-7">
+                      <input
+                        v-model="sauser.newPassword"
+                        :type="toggleNewPass ? 'text' : 'password'"
+                        class="form-control"
+                        required
+                      >
+                      <span v-if="errors.newPassword.hasError" class="help-block">{{$t('settings.not_valid_password')}}</span>
+                    </div>
+                    <div class="col-sm-2">
+                      <button
+                        tabindex="-1"
+                        @click="toggleNewPassword()"
+                        type="button"
+                        class="btn btn-primary adjust-top-min"
+                      >
+                        <span :class="[!toggleNewPass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <div :class="['form-group margintop', errors.confirmNewPassword.hasError ? 'has-error' : '']">
+                    <label class="col-sm-3 control-label">
+                      {{$t('settings.confirm_password')}}
+                    </label>
+                    <div class="col-sm-7">
+                      <input
+                        v-model="sauser.confirmNewPassword"
+                        :type="toggleNewPass ? 'text' : 'password'"
+                        class="form-control"
+                        required
+                      >
+                      <span v-if="errors.confirmNewPassword.hasError" class="help-block">{{$t('settings.not_equal_password')}}</span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+                <button 
+                  class="btn btn-primary" 
+                  type="submit"
+                  :disabled="sauser.newPassword != sauser.confirmNewPassword || sauser.newPassword == 0"
+                >
+                  {{$t('edit')}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div v-else-if="configuration.installed" class="margintop">
         <div class="alert alert-warning">
@@ -153,78 +224,6 @@
       </div>
     </div>
   </div>
-  
-  <div class="modal" id="changePwdModal" tabindex="-1" role="dialog" data-backdrop="static">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">
-            {{$t('settings.change_sa_password')}}
-          </h4>
-        </div>
-        <div class="alert alert-info">
-          <span class="pficon pficon pficon-info"></span>
-          <strong>{{$t('settings.notice')}}:</strong>
-          {{$t('settings.password_must_respect_criteria')}} <a href='https://docs.microsoft.com/en-US/sql/relational-databases/security/password-policy' target='_blank'>{{$t('settings.here')}}</a>.
-        </div>
-        <form
-          class="form-horizontal"
-          v-on:submit.prevent="changePassword()"
-        >
-          <div class="modal-body">
-            <div :class="['form-group margintop', errors.newPassword.hasError ? 'has-error' : '']">
-              <label class="col-sm-2 control-label">
-                {{$t('settings.password')}}
-              </label>
-              <div class="col-sm-5">
-                <input
-                  v-model="sauser.newPassword"
-                  :type="toggleNewPass ? 'text' : 'password'"
-                  class="form-control"
-                  required
-                >
-                <span v-if="errors.newPassword.hasError" class="help-block">{{$t('settings.not_valid_password')}}</span>
-              </div>
-              <div class="col-sm-2">
-                <button
-                  tabindex="-1"
-                  @click="toggleNewPassword()"
-                  type="button"
-                  class="btn btn-primary adjust-top-min"
-                >
-                  <span :class="[!toggleNewPass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
-                </button>
-              </div>
-            </div>
-            <div :class="['form-group margintop', errors.confirmNewPassword.hasError ? 'has-error' : '']">
-              <label class="col-sm-2 control-label">
-                {{$t('settings.confirm_password')}}
-              </label>
-              <div class="col-sm-5">
-                <input
-                  v-model="sauser.confirmNewPassword"
-                  :type="toggleNewPass ? 'text' : 'password'"
-                  class="form-control"
-                  required
-                >
-                <span v-if="errors.confirmNewPassword.hasError" class="help-block">{{$t('settings.not_equal_password')}}</span>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-            <button 
-              class="btn btn-primary" 
-              type="submit"
-              :disabled="sauser.newPassword != sauser.confirmNewPassword"
-            >
-              {{$t('edit')}}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -232,6 +231,10 @@ export default {
   name: "Settings",
   mounted() {
     this.getConfig()
+  },
+  beforeRouteLeave(to, from, next) {
+    $(".modal").modal("hide");
+    next();
   },
   data() {
     return {
@@ -247,7 +250,7 @@ export default {
       sauser: {
         newPassword: null,
         confirmNewPassword: null
-      }
+      },
       errors: this.initErrors(),
       togglePass: false,
       toggleNewPass: false
@@ -426,6 +429,9 @@ export default {
     },
     toggleNewPassword() {
       this.toggleNewPass = !this.toggleNewPass;
+    },
+    openChangePassword() {
+      $("#changePwdModal").modal("show");
     }
   }
 };

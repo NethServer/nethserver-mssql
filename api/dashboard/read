@@ -22,6 +22,7 @@
 
 use strict;
 use warnings;
+use esmith::ConfigDB;
 use NethServer::Password;
 
 require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
@@ -48,8 +49,8 @@ if ($cmd eq 'status') {
     $version =~ s/^\s+|\s+$//g;
     $ret->{'status'}{'version'} = $version;
     
-    $out = `systemctl is-active mssql-server`;
-    $ret->{'status'}{'isrunning'} = ($? == 0)? 1 : 0;
+    my $db = esmith::ConfigDB->open_ro();
+    $ret->{'status'}{'isenabled'} = $db->get_prop('mssql-server', 'status') || 'disabled';
     
     my $dbnumber = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -h -1 -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.databases;"`;
     $dbnumber =~ s/^\s+|\s+$//g;

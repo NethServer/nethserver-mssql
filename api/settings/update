@@ -43,7 +43,7 @@ my %props = ();
     
 if($input->{'action'} eq 'edit') {
     $db->get('mssql-server')->merge_props(%props);
-} else {
+} elsif ($input->{'action'} ne 'change-password') {
     error();
 }
 
@@ -64,11 +64,12 @@ if($input->{'action'} eq 'edit') {
       $exitCode = 1;
   }
   
-} else if ($input->{'action'} eq 'change-password') {
+} elsif ($input->{'action'} eq 'change-password') {
   
-  my $newpassword = $input->{'password'}{'newPassword'};
+  my $newpassword = $input->{'password'}->{'newPassword'};
+  print $newpassword;
   
-  if (esmith::event::event_signal('nethserver-mssql-change-password $newpassword')) {
+  if (esmith::event::event_signal('nethserver-mssql-change-password',$newpassword)) {
       $ret = {'state' => 'success'};
   } else {
       $ret = {
