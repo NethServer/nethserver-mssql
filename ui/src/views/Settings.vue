@@ -157,6 +157,11 @@
                   <strong>{{$t('settings.notice')}}:</strong>
                   {{$t('settings.password_must_respect_criteria')}} <a href='https://docs.microsoft.com/en-US/sql/relational-databases/security/password-policy' target='_blank'>{{$t('settings.here')}}</a>.
                 </div>
+                <div class="alert alert-warning margintop">
+                  <span class="pficon pficon-warning-triangle-o"></span>
+                  <strong>{{$t('settings.attention')}}:</strong>
+                  {{$t('settings.sql_server_will_be_restarted')}}.
+                </div>
                 <form
                   class="form-horizontal"
                   v-on:submit.prevent="changePassword()"
@@ -208,7 +213,7 @@
                   type="submit"
                   :disabled="sauser.newPassword != sauser.confirmNewPassword || sauser.newPassword == 0"
                 >
-                  {{$t('edit')}}
+                  {{$t('change')}}
                 </button>
               </div>
             </div>

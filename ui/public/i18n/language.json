@@ -22,7 +22,12 @@
         "not_equal_password": "Passwords are not equals",
         "notice": "Notice",
         "password_must_respect_criteria": "Password must respect SQL Server criteria, otherwise password update will fails. Check password criteria",
-        "here": "here"
+        "here": "here",
+        "attention": "Attention",
+        "sql_server_will_be_restarted": "SQL Server will be restarted during password change"
+    },
+    "databases": {
+        "title": "Databases"
     },
     "about": {
         "title": "About",
@@ -69,5 +74,5 @@
     "package_required": "Missing packages",
     "package_required_desc": "To access this page you have to install the required packages listed below",
     "install_package": "Install package",
-    "edit": "Edit"
+    "change": "Change"
 }
