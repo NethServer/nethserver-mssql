@@ -27,7 +27,14 @@
         "sql_server_will_be_restarted": "SQL Server will be restarted during password change"
     },
     "databases": {
-        "title": "Databases"
+        "title": "Databases",
+        "title_mgmt": "Databases management",
+        "database_name": "Database name",
+        "database_already_exists": "Database already exists",
+        "create": "Create database",
+        "not_valid_database_name": "Database name is not valid",
+        "database_create_ok": "Database successfully created",
+        "create_database": "Create new database"
     },
     "about": {
         "title": "About",
@@ -35,7 +42,8 @@
         "bug_tracker": "Bug tracker"
     },
     "validation": {
-        "NotValidProductKey": "Product Key is not valid"
+        "NotValidProductKey": "Product Key is not valid",
+        "DbAlreadyExists": "Database already exists"
     },
     "logs": {
         "title": "Logs",

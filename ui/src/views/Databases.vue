@@ -22,7 +22,7 @@
 
 <template>
   <div>
-    <h2>{{$t('databases.title')}}</h2>
+    <h2>{{$t('databases.title_mgmt')}}</h2>
     
     <!-- error message -->
     <div v-if="errorMessage" class="alert alert-danger alert-dismissable">
@@ -35,7 +35,44 @@
 
     <div v-if="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-if="uiLoaded">
-      
+      <h3>{{$t('databases.create_database')}}</h3>
+      <form class="form-horizontal" v-on:submit.prevent="createDatabase()">
+        <div class="row">
+          <div class="col-lg-12">
+            <div :class="['form-group margintop', errors.newDatabase.hasError ? 'has-error' : '']">
+              <label class="col-sm-2 control-label">
+                {{$t('databases.database_name')}}
+              </label>
+              <div class="col-sm-5">
+                <input
+                  v-model="newDatabase.name"
+                  type="text"
+                  required
+                  class="form-control"
+                >
+                <span v-if="errors.newDatabase.hasError" class="help-block">{{$t('databases.database_already_exists')}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+              </label>
+              <div class="col-sm-5">
+                <button 
+                  class="btn btn-primary margintop" 
+                  type="submit"
+                  :disabled="!newDatabase.name || newDatabase.isLoading"
+                >
+                  {{$t('databases.create')}}
+                </button>
+                <div
+                  v-if="newDatabase.isLoading"
+                  class="spinner spinner-sm form-spinner-loader marginleft"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -44,17 +81,17 @@
 export default {
   name: "Databases",
   mounted() {
-    
-  },
-  beforeRouteLeave(to, from, next) {
-    $(".modal").modal("hide");
-    next();
+    this.uiLoaded = !this.uiLoaded;
   },
   data() {
     return {
       uiLoaded: false,
       errorMessage: null,
-      errors: this.initErrors()
+      errors: this.initErrors(),
+      newDatabase: {
+        name: null,
+        isLoading: false
+      }
     }
   },
   methods: {
@@ -65,9 +102,75 @@ export default {
     closeErrorMessage() {
       this.errorMessage = null;
     },
+    createDatabase() {
+      var context = this;
+      context.newDatabase.isLoading = true;
+      
+      var settingsObj = {
+        action: "create-database",
+        "newDatabase": {
+          name: context.newDatabase.name
+        }
+      };
+      context.loaders = true;
+      context.errors = context.initErrors();
+      nethserver.exec(
+        ["nethserver-mssql/databases/validate"],
+        settingsObj,
+        null,
+        function(success) {
+          context.loaders = false;
+          
+          nethserver.notifications.success = context.$i18n.t(
+            "databases.database_create_ok"
+          );
+          
+          nethserver.notifications.error = context.$i18n.t(
+            "databases.not_valid_database_name"
+          );
+          
+          // update values
+          nethserver.exec(
+            ["nethserver-mssql/databases/update"],
+            settingsObj,
+            function(stream) {
+              console.info("create-database", stream);
+            },
+            function(success) {
+              context.newDatabase.name = null;
+              context.newDatabase.isLoading = false;
+            },
+            function(error, data) {
+              console.error(error, data);
+            },
+            true //sudo
+          );
+        },
+        function(error, data) {
+          var errorData = {};
+          context.loaders = false;
+          context.errors = context.initErrors();
+          try {
+            errorData = JSON.parse(data);
+            for (var e in errorData.attributes) {
+              var attr = errorData.attributes[e];
+              context.errors[attr.parameter].hasError = true;
+              context.errors[attr.parameter].message = attr.error;
+            }
+            context.newDatabase.isLoading = false;
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        true // sudo
+      );
+    },
     initErrors() {
       return {
-        
+        newDatabase: {
+          hasError: false,
+          message: ""
+        }
       }
     }
   }
@@ -77,5 +180,8 @@ export default {
 <style scoped>
 .margintop {
   margin-top: 15px;
+}
+.maginleft {
+  margin-left: 20px;
 }
 </style>
