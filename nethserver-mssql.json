@@ -15,9 +15,9 @@
         "url": "https://github.com/NethServer/dev/issues"
     },
     "author": {
-        "name": "Giacomo Sanchietti, Davide Principi, Federico Ballarini",
-        "url": "https://github.com/NethServer/nethserver-hotsync",
-        "email": "giacomo.sanchietti@nethesis.it, davide.principi@nethesis.it, fed.ballarini@gmail.com"
+        "name": "Federico Ballarini, Giacomo Sanchietti, Davide Principi",
+        "url": "https://github.com/NethServer/nethserver-mssql",
+        "email": "fed.ballarini@gmail.com, giacomo.sanchietti@nethesis.it, davide.principi@nethesis.it"
     },
     "icon": "logo.png"
 } 
