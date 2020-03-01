@@ -383,6 +383,7 @@ export default {
               console.info("nethserver-mssql-change-password", stream);
             },
             function(success) {
+              $("#changePwdModal").modal("hide");
               context.getConfig();
             },
             function(error, data) {
