@@ -102,6 +102,9 @@
               <button class="btn btn-primary btn-lg">{{$t('install_package')}}</button>
             </router-link>
           </div>
+          <div class="margintop">
+            <center>{{$t('dashboard.pre_license_terms')}} <a href="https://www.microsoft.com/en-us/licensing/product-licensing/products" target="_blank">{{$t('dashboard.ms_license_terms')}}</a>.</center>
+          </div>
         </div>
       </div>
     </div>

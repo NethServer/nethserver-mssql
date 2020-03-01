@@ -65,7 +65,9 @@
         "check_sql_or_sa_password": "Please check if SQL Server is running. If you have changed SA password without the correct NethServer event restore the correct password with this command",
         "command_to_change_pwd": "or use this command to change properly the password with a custom password",
         "enabled": "Enabled",
-        "disabled": "Disabled"
+        "disabled": "Disabled",
+        "pre_license_terms": "By downloading this package, you accept",
+        "ms_license_terms": "Microsoft license terms" 
     },
     "docs": {
         "MssqlEdition": "Choose SQL Server edition from the list or insert a Product Key.",

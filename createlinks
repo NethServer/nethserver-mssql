@@ -40,11 +40,11 @@ event_actions($event, qw(
   nethserver-mssql-install 10
   nethserver-mssql-setup 20
   nethserver-mssql-tools 30
+  firewall-adjust 80
 ));
 
 event_services($event, qw(
   mssql-server restart
-  shorewall reload
 ));
 
 # mssql change password event

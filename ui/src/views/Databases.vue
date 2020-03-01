@@ -181,7 +181,7 @@ export default {
 .margintop {
   margin-top: 15px;
 }
-.maginleft {
+.marginleft {
   margin-left: 20px;
 }
 </style>

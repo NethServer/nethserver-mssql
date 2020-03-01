@@ -114,7 +114,7 @@
                     v-model="configuration.sapassword"
                     :type="togglePass ? 'text' : 'password'"
                     class="form-control"
-                    disabled
+                    readonly
                   >
                 </div>
                 <div class="col-sm-2">
@@ -151,21 +151,21 @@
                   {{$t('settings.change_sa_password')}}
                 </h4>
               </div>
-              <div class="modal-body">
-                <div class="alert alert-info">
-                  <span class="pficon pficon pficon-info"></span>
-                  <strong>{{$t('settings.notice')}}:</strong>
-                  {{$t('settings.password_must_respect_criteria')}} <a href='https://docs.microsoft.com/en-US/sql/relational-databases/security/password-policy' target='_blank'>{{$t('settings.here')}}</a>.
-                </div>
-                <div class="alert alert-warning margintop">
-                  <span class="pficon pficon-warning-triangle-o"></span>
-                  <strong>{{$t('settings.attention')}}:</strong>
-                  {{$t('settings.sql_server_will_be_restarted')}}.
-                </div>
-                <form
-                  class="form-horizontal"
-                  v-on:submit.prevent="changePassword()"
-                >
+              <form
+                class="form-horizontal"
+                v-on:submit.prevent="changePassword()"
+              >
+                <div class="modal-body">
+                  <div class="alert alert-info">
+                    <span class="pficon pficon pficon-info"></span>
+                    <strong>{{$t('settings.notice')}}:</strong>
+                    {{$t('settings.password_must_respect_criteria')}} <a href='https://docs.microsoft.com/en-US/sql/relational-databases/security/password-policy' target='_blank'>{{$t('settings.here')}}</a>.
+                  </div>
+                  <div class="alert alert-warning margintop">
+                    <span class="pficon pficon-warning-triangle-o"></span>
+                    <strong>{{$t('settings.attention')}}:</strong>
+                    {{$t('settings.sql_server_will_be_restarted')}}.
+                  </div>
                   <div :class="['form-group margintop', errors.newPassword.hasError ? 'has-error' : '']">
                     <label class="col-sm-3 control-label">
                       {{$t('settings.password')}}
@@ -204,18 +204,18 @@
                       <span v-if="errors.confirmNewPassword.hasError" class="help-block">{{$t('settings.not_equal_password')}}</span>
                     </div>
                   </div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-                <button 
-                  class="btn btn-primary" 
-                  type="submit"
-                  :disabled="sauser.newPassword != sauser.confirmNewPassword || sauser.newPassword == 0"
-                >
-                  {{$t('change')}}
-                </button>
-              </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+                  <button 
+                    class="btn btn-primary" 
+                    type="submit"
+                    :disabled="sauser.newPassword != sauser.confirmNewPassword || !sauser.newPassword"
+                  >
+                    {{$t('change')}}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
