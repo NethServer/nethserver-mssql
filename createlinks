@@ -76,7 +76,13 @@ event_actions($event, qw(
 $event = "post-restore-config";
 
 event_actions($event, qw(
-  nethserver-mssql-restore-config 50
+  nethserver-mssql-install 50
+  nethserver-mssql-setup 51
+  nethserver-mssql-tools 52
+));
+
+event_services($event, qw(
+  mssql-server restart
 ));
 
 # post-restore-data
