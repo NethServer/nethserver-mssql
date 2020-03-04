@@ -22,6 +22,10 @@ env:
         -e NSVER
         -e ENDPOINTS_PACK
         "
+
+install:
+  - bash prep-sources &> /dev/null
+
 script: >
     docker run -ti --name makerpms ${EVARS}
     --hostname b${TRAVIS_BUILD_NUMBER}.nethserver.org
