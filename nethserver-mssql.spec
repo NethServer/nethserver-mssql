@@ -1,6 +1,6 @@
-Summary: NethServer MsSQL integration
+Summary: NethServer MSSQL
 Name: nethserver-mssql
-Version: 1.0.0
+Version: 1.0.1
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -13,7 +13,7 @@ Requires: nethserver-base
 BuildRequires: nethserver-devtools
 
 %description
-NethServer and Microsoft SQL Server integration
+MSSQL integration for NethServer
 
 %prep
 %setup
@@ -44,3 +44,11 @@ rm -rf %{buildroot}
 %doc COPYING
 %dir %{_nseventsdir}/%{name}-update
 %attr(0440,root,root) /etc/sudoers.d/50_nsapi_nethserver_mssql
+
+
+%changelog
+* Wed Mar 4 2020 Federico Ballarini <fed.ballarini@gmail.com> - 1.0.1-1
+- MSSQL integration for NethServer - NethServer/dev#6078
+
+* Fri Feb 28 2020 Federico Ballarini <fed.ballarini@gmail.com> - 1.0.0-1
+- Initial package
