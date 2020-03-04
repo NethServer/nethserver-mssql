@@ -1,3 +1,6 @@
+[main]
+host = https://www.transifex.com
+
 [nethserver.CockpitMssql]
 source_file = ui/public/i18n/language.json
 source_lang = en
