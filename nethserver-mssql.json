@@ -1,8 +1,8 @@
 {
     "id": "nethserver-mssql",
     "name": "Microsoft SQL Server",
-    "summary": "Nethserver MsSQL",
-    "description": "Nethserver MsSQL integration",
+    "summary": "Nethserver MSSQL",
+    "description": "MSSQL integration for NethServer",
     "url": "",
     "homepage": "https://github.com/NethServer/nethserver-mssql",
     "provides": ["nethserver-mssql"],

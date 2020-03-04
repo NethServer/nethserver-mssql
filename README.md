@@ -1,9 +1,14 @@
 # nethserver-mssql
-NethServer and Microsoft SQL Server integration.
+MSSQL integration for NethServer.
+
+You can install this package from Software Center or with:
+
+    yum install -y nethserver-mssql --enablerepo=nethforge
+
 
 When installed the module generates a default configuration as follow:
 * Auto-generated SA password saved in `/var/lib/nethserver/secrets/mssql`
-* Create default MsSQL databases (`master`, `model`, `msdb`, `tempdb`)
+* Create default MSSQL databases (`master`, `model`, `msdb`, `tempdb`)
 * Allow access to SQL service from Green network on default port 1433
 
 User can change access network from Cockpit Services page or from Firewall section.
