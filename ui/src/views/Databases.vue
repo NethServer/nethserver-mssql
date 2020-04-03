@@ -188,7 +188,7 @@ export default {
       var context = this;
       context.uiLoaded = false;
       nethserver.exec(
-        ["nethserver-mssql/databases/read"],
+        ["nethserver-mssql/databases/execute"],
         { action: "db-list" },
         null,
         function(success) {

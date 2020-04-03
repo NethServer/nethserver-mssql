@@ -8,6 +8,6 @@ Cmnd_Alias NSAPI_NETHSERVER_MSSQL = \
   /usr/libexec/nethserver/api/nethserver-mssql/settings/validate, \
   /usr/libexec/nethserver/api/nethserver-mssql/databases/update, \
   /usr/libexec/nethserver/api/nethserver-mssql/databases/validate, \
-  /usr/libexec/nethserver/api/nethserver-mssql/databases/read
+  /usr/libexec/nethserver/api/nethserver-mssql/databases/execute
 
 Defaults!NSAPI_NETHSERVER_MSSQL !requiretty
