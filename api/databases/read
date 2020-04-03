@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2020 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use NethServer::Password;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+if ($cmd eq 'db-list') {
+  
+  my $password = NethServer::Password::store("mssql");
+  
+  my $out = `/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $password -Q "SET NOCOUNT ON; SELECT
+      'Database name' = DB_NAME(database_id)
+    , 'Log size (MB)' = CAST(SUM(CASE WHEN type_desc = 'LOG' THEN size END) * 8. / 1024 AS DECIMAL(8,2))
+    , 'Row size (MB)' = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size END) * 8. / 1024 AS DECIMAL(8,2))
+    , 'Total size (MB)' = CAST(SUM(size) * 8. / 1024 AS DECIMAL(8,2))
+    FROM sys.master_files WITH(NOWAIT)
+    GROUP BY database_id
+    ORDER BY 'Database name'"`;
+  
+  print $out;
+  
+} else {
+    error();
+}

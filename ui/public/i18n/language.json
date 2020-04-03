@@ -34,7 +34,9 @@
         "create": "Create database",
         "not_valid_database_name": "Database name is not valid",
         "database_create_ok": "Database successfully created",
-        "create_database": "Create new database"
+        "create_database": "Create new database",
+        "error_reading_mssql_db_details": "Error while reading databases details",
+        "databases_details": "Databases details"
     },
     "about": {
         "title": "About",

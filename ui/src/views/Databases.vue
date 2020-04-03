@@ -73,6 +73,14 @@
           </div>
         </div>
       </form>
+      
+      <h3>{{$t('databases.databases_details')}}</h3>
+      <div class="row">
+        <div class="col-lg-12">
+          <div v-if="!dbList.details" class="spinner spinner-sm"></div>
+          <pre v-if="dbList.details" class="prettyprint">{{dbList.details}}</pre>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -81,7 +89,7 @@
 export default {
   name: "Databases",
   mounted() {
-    this.uiLoaded = !this.uiLoaded;
+    this.getDbList();
   },
   data() {
     return {
@@ -91,6 +99,9 @@ export default {
       newDatabase: {
         name: null,
         isLoading: false
+      },
+      dbList: {
+        details: null
       }
     }
   },
@@ -172,6 +183,26 @@ export default {
           message: ""
         }
       }
+    },
+    getDbList() {
+      var context = this;
+      context.uiLoaded = false;
+      nethserver.exec(
+        ["nethserver-mssql/databases/read"],
+        { action: "db-list" },
+        null,
+        function(success) {
+          try {
+            context.dbList.details = success;
+          } catch (e) {
+            console.error(e);
+          }
+          context.uiLoaded = true;
+        },
+        function(error) {
+          context.showErrorMessage(context.$i18n.t("databases.error_reading_mssql_db_details"), error);
+        }
+      );
     }
   }
 };
