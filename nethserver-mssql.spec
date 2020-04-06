@@ -1,6 +1,6 @@
 Summary: NethServer MSSQL
 Name: nethserver-mssql
-Version: 1.0.1
+Version: 1.0.2
 Release: 1%{?dist}
 License: GPL
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Apr 6 2020 Federico Ballarini <fed.ballarini@gmail.com> - 1.0.2-1
+- MSSQL: show databases list in Cockpit - NethServer/dev#6106
+
 * Wed Mar 4 2020 Federico Ballarini <fed.ballarini@gmail.com> - 1.0.1-1
 - MSSQL integration for NethServer - NethServer/dev#6078
 
