@@ -81,6 +81,43 @@
           <pre v-if="dbList.details" class="prettyprint">{{dbList.details}}</pre>
         </div>
       </div>
+      
+      <h3>{{$t('databases.terminal_utility')}}</h3>
+      <form class="form-horizontal">
+        <div class="row">
+          <div class="col-lg-12">
+            {{$t('databases.terminal_utility_desc')}}:
+            <div class="form-group margintop">
+              <label class="col-sm-2 control-label">
+                {{$t('databases.sqlcmd_path')}}
+              </label>
+              <div class="col-sm-5">
+                <input
+                  id="sqlcmd"
+                  readonly
+                  type="text"
+                  class="form-control"
+                  value="/opt/mssql-tools/bin/sqlcmd"
+                >
+              </div>
+            </div>
+            <div class="form-group margintop">
+              <label class="col-sm-2 control-label">
+              </label>
+              <div class="col-sm-5">
+                <button 
+                  class="btn btn-primary" 
+                  type="button"
+                  @click="copyCmd('sqlcmd')"
+                >
+                  {{$t('databases.copy')}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      
     </div>
   </div>
 </template>
@@ -203,6 +240,12 @@ export default {
           context.showErrorMessage(context.$i18n.t("databases.error_reading_mssql_db_details"), error);
         }
       );
+    },
+    copyCmd(id) {
+      var command = document.getElementById(id);      
+      command.select();
+      command.setSelectionRange(0, command.value.length);
+      document.execCommand("copy");
     }
   }
 };
